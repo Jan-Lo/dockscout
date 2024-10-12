@@ -1,23 +1,27 @@
-FROM alpine:3.14@sha256:eb3e4e175ba6d212ba1d6e04fc0782916c08e1c9d7b45892e9796141b1d379ae
+# 使用基础镜像
+FROM ubuntu:latest
 
-ENV BLUEBIRD_WARNINGS=0 \
-  NODE_ENV=production \
-  NODE_NO_WARNINGS=1 \
-  NPM_CONFIG_LOGLEVEL=warn \
-  SUPPRESS_NO_CONFIG_WARNING=true
+# 安装中文语言包
+RUN apt-get update && apt-get install -y locales \
+    && locale-gen zh_CN.UTF-8 \
+    && update-locale LANG=zh_CN.UTF-8
 
-RUN apk add --no-cache \
-  nodejs
+# 设置环境变量
+ENV LANG zh_CN.UTF-8
+ENV LANGUAGE zh_CN:zh
+ENV LC_ALL zh_CN.UTF-8
 
-COPY package.json ./
+# 设置工作目录
+WORKDIR /app
 
-RUN  apk add --no-cache npm \
- && npm i --no-optional \
- && npm cache clean --force \
- && apk del npm
- 
+# 复制当前目录内容到工作目录
 COPY . /app
 
-CMD ["node","/app/app.js"]
+# 安装依赖（如果有）
+# RUN npm install
 
-EXPOSE 3000
+# 暴露端口（如果需要）
+# EXPOSE 3000
+
+# 启动命令（根据你的应用调整）
+# CMD ["npm", "start"]
